@@ -17,7 +17,7 @@ type Todo = {
 };
 
 function TodoListPage() {
-    const [rows, setRows] = useState<Todo[]>([]);
+    const [rows] = useState<Todo[]>([]);
     return (
         <TableContainer component={Paper}>
             <Table>

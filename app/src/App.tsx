@@ -1,7 +1,7 @@
 import React from 'react';
 import MainPage from './components/pages/MainPage'
 import './App.css';
-import { createTheme, Menu, ThemeProvider } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material';
 import SampleHeader from './components/SampleHeader';
 
 const theme = createTheme();

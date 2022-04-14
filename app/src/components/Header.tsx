@@ -15,6 +15,9 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import { loginGoogleAuth } from '../FirebaseConnection';
+import { useState } from 'react';
+import { getAuth } from '@firebase/auth';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -56,13 +59,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function SampleHeader() {
+
+export default function Header() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
 
     const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -82,13 +85,36 @@ export default function SampleHeader() {
     };
 
     const menuId = 'primary-search-account-menu';
-    const renderMenu = (
+    let a = getAuth();
+    console.log("a is ["+a+"]");
+    
+    const [ auth, setAuth ] = useState<any>(a);
+
+    const openProfile = () => {
+
+    };
+
+    const login = () => {
+        loginGoogleAuth().then((result => {
+            console.log(result);
+            setAuth(result);
+        }))
+
+    };
+
+    const logout = () => {
+        let ret = loginGoogleAuth();
+        console.log(ret);
+    };
+
+    const signUp = () => {
+
+    };
+
+    const createMenu = (children: any) => (
         <Menu
             anchorEl={anchorEl}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
+            anchorOrigin={{vertical: "top", horizontal: "right"}}
             id={menuId}
             keepMounted
             transformOrigin={{
@@ -96,63 +122,21 @@ export default function SampleHeader() {
                 horizontal: 'right',
             }}
             open={isMenuOpen}
-            onClose={handleMenuClose}
-        >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            onClose={handleMenuClose}>
+                {children}
         </Menu>
     );
-
-    const mobileMenuId = 'primary-search-account-menu-mobile';
-    const renderMobileMenu = (
-        <Menu
-            anchorEl={mobileMoreAnchorEl}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            id={mobileMenuId}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
-        >
-            <MenuItem>
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                    <Badge badgeContent={4} color="error">
-                        <MailIcon />
-                    </Badge>
-                </IconButton>
-                <p>Messages</p>
-            </MenuItem>
-            <MenuItem>
-                <IconButton
-                    size="large"
-                    aria-label="show 17 new notifications"
-                    color="inherit"
-                >
-                    <Badge badgeContent={17} color="error">
-                        <NotificationsIcon />
-                    </Badge>
-                </IconButton>
-                <p>Notifications</p>
-            </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
-                </IconButton>
-                <p>Profile</p>
-            </MenuItem>
-        </Menu>
+    
+    const renderMenu = auth ? createMenu(
+        <>
+            <MenuItem onClick={openProfile}>Profile</MenuItem>
+            <MenuItem onClick={logout}>Logout</MenuItem>
+        </>
+    ) : createMenu(
+        <>
+            <MenuItem onClick={login}>Login</MenuItem>
+            <MenuItem onClick={signUp}>Sign Up</MenuItem>
+        </>
     );
 
     return (
@@ -174,7 +158,6 @@ export default function SampleHeader() {
                         component="div"
                         sx={{ display: { xs: 'none', sm: 'block' } }}
                     >
-                        MUI
                     </Typography>
                     <Search>
                         <SearchIconWrapper>
@@ -185,7 +168,7 @@ export default function SampleHeader() {
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
-                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }}>{auth?.currentUser?.uid}</Box>
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                             <Badge badgeContent={4} color="error">
@@ -213,21 +196,9 @@ export default function SampleHeader() {
                             <AccountCircle />
                         </IconButton>
                     </Box>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="show more"
-                            aria-controls={mobileMenuId}
-                            aria-haspopup="true"
-                            onClick={handleMobileMenuOpen}
-                            color="inherit"
-                        >
-                            <MoreIcon />
-                        </IconButton>
-                    </Box>
                 </Toolbar>
             </AppBar>
-            {renderMobileMenu}
+            {/* {renderMobileMenu} */}
             {renderMenu}
         </Box>
     );

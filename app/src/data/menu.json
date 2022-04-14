@@ -1,0 +1,26 @@
+[
+    {
+        "id": "home",
+        "icon": "home",
+        "name": "Home",
+        "children": []
+    },
+    {
+        "id": "dashboard",
+        "icon": "dashboard",
+        "name": "Dashboard",
+        "children": []
+    },
+    {
+        "id": "todo",
+        "icon": "home",
+        "name": "TODO",
+        "children": []
+    },
+    {
+        "id": "profile",
+        "icon": "profile",
+        "name": "Profile",
+        "children": []
+    }
+]

@@ -1,12 +1,11 @@
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Checkbox } from '@mui/material';
-import React, { useState } from 'react';
-// import { initializeApp } from 'firebase/app';
-
-// const cfg = {
-
-// };
-
-// const app = initializeApp(cfg);
+import { collection, doc, getDoc } from '@firebase/firestore';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Checkbox, Button, TableSortLabel, FormLabel } from '@mui/material';
+import { getConfig } from '@testing-library/dom';
+import { getAuth } from 'firebase/auth';
+import { app, firestore } from 'FirebaseConnection';
+import { load } from 'mime';
+import React, { createContext , useState, useContext, useEffect } from 'react';
+import { getDatabase, ref, set } from 'firebase/database';
 
 type Todo = {
     title: string;
@@ -16,45 +15,87 @@ type Todo = {
     user: string;
 };
 
-function TodoListPage() {
-    const [rows] = useState<Todo[]>([]);
+function useTodoList(userId: string) {
+    const [ todoList , setTodoList ] = useState<Todo[]>([]);
+
+    useEffect(() => {
+
+    }, [todoList]);
+
+    return todoList;
+}
+
+type TodoProps = {
+
+};
+
+export const TodoListPage:React.VFC<TodoProps> = (props: TodoProps) => {
+
+    const [rows, setRows ] = useState<any[]>([]);
+    // const rows = [{
+    //     "title": "hoge",
+    //     "created_at": new Date(),
+    //     "content": "content",
+    //     "done": true
+    // }];
+
+    const loadData = async () => {
+        const auth = getAuth();
+        const uid: string = auth?.currentUser?.uid ?? "";
+        const docRef = await doc(firestore, "todolist" , uid);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()){
+            console.log(docSnap.data().items);
+            setRows(docSnap.data().items);
+        }
+    };
+
+    const upload = async () => {
+        const auth = getAuth();
+        const uid: string = auth?.currentUser?.uid ?? "";
+        
+        const realtime = getDatabase();
+        set(ref(realtime, 'users/' + uid), {
+            created_at: new Date(),
+            
+        });
+    };
+
     return (
+        <>
+        <Button onClick={loadData}>Load Data</Button>
+        <Button onClick={upload}>upload</Button>
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>
                     <TableCell>Done</TableCell>
                     <TableCell>Title</TableCell>
-                    <TableCell>Detail</TableCell>
+                    <TableCell>Content</TableCell>
                     <TableCell>Created At</TableCell>
-                    <TableCell>User</TableCell>
                 </TableHead>
                 <TableBody>
                     {
-                        rows.map((row: Todo) => (
-                            <>
-                                <TableRow>
-                                    <Checkbox checked={row.done} />
-                                </TableRow>
-                                <TableRow>
-                                    {row.title}
-                                </TableRow>
-                                <TableRow>
-                                    {row.detail}
-                                </TableRow>
-                                <TableRow>
-                                    {row.user}
-                                </TableRow>
-                                <TableRow>
-                                    {row.created_at}
-                                </TableRow>
-                            </>
-                        )
-                        )
+                        rows.map(p => (<TableRow>
+                            <TableCell>
+                                <Checkbox checked={p.done} />
+                            </TableCell>
+                            <TableCell>
+                                {p.title}
+                            </TableCell>
+                            <TableCell>
+                                {p.content}
+                            </TableCell>
+                            <TableCell>
+                                {p.created_at.toString()}
+                            </TableCell>
+                        </TableRow>))
                     }
                 </TableBody>
             </Table>
         </TableContainer>
+        </>
     );
 }
 
 export default TodoListPage;
+
